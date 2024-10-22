@@ -104,29 +104,49 @@ class AuthRemoteDTO {
     }
   }
 
-Future<void> resendVerificationEmail(String email) async {
-  try {
-    final response = await client.post(
-      Uri.parse('${AppConstants.baseUrl}/api/auth/resend-verification'), 
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    );
+  Future<void> resendVerificationEmail(String email) async {
+    try {
+      final response = await client.post(
+        Uri.parse('${AppConstants.baseUrl}/api/auth/resend-verification'), 
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
 
-    print('Resend Verification Request:');
-    print('URL: ${response.request?.url}');
-    print('Body: ${jsonEncode({'email': email})}');
-    print('Response Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
+      print('Resend Verification Request:');
+      print('URL: ${response.request?.url}');
+      print('Body: ${jsonEncode({'email': email})}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
-    if (response.statusCode == 200) {
-      print('Verification email resent successfully');
-    } else {
-      throw Exception('Failed to resend verification email: ${response.body}');
+      if (response.statusCode == 200) {
+        print('Verification email resent successfully');
+      } else {
+        throw Exception('Failed to resend verification email: ${response.body}');
+      }
+    } catch (e) {
+      print('Error resending verification email: $e');
+      rethrow;
     }
-  } catch (e) {
-    print('Error resending verification email: $e');
-    rethrow;
   }
-}
 
+  Future<void> requestPasswordChange(String email) async {
+    try {
+      final response = await client.post(
+        Uri.parse('${AppConstants.baseUrl}/api/auth/request-reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Verification code sent successfully');
+      } else if (response.statusCode == 401) {
+        throw Exception('Invalid email format');
+      } else {
+        throw Exception('Failed to send verification code: ${response.body}');
+      }
+    } catch (e) {
+      print('Error sending verification code: $e');
+      rethrow;
+    }
+  }
 }

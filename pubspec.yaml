@@ -26,4 +26,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/image/svg/email_sent.svg
+    - assets/image/svg/

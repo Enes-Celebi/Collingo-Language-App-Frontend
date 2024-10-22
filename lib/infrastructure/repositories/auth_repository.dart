@@ -21,4 +21,8 @@ class AuthRepository {
   Future<void> resendVerificationEmail(String email) {
     return remoteDTO.resendVerificationEmail(email);
   }
+
+  Future<void> requestPasswordChange(String email) {
+    return remoteDTO.requestPasswordChange(email);
+  }
 }

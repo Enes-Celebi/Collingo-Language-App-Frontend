@@ -1,3 +1,4 @@
+import 'package:collingo/presentation/auth/pages/forgot_password_page.dart';
 import 'package:collingo/presentation/themes/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
             routes: {
               '/login': (context) => LoginPage(),
               '/register': (context) => RegistrationPage(),
+              '/forgotPassowrd': (context) => ForgotPasswordPage()
             },
           );
         },

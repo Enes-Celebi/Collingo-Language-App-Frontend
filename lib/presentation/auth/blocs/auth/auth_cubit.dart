@@ -51,4 +51,15 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthFailure(message: 'Failed to resend verification email.')); 
     }
   }
+
+  Future<void> requestPasswordChange(String email) async {
+    emit(AuthLoading());
+    try {
+      await authRepository.requestPasswordChange(email);
+      emit(AuthSuccess(message: 'Successfully sent verification code!'));
+    } catch (e) {
+      print('send verification code error: $e');
+      emit(AuthFailure(message: 'Failed to send verification code.'));
+    }
+  }
 }

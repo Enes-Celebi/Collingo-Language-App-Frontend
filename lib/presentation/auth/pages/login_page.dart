@@ -1,3 +1,4 @@
+import 'package:collingo/presentation/auth/pages/forgot_password_page.dart';
 import 'package:collingo/presentation/home/pages/home_page.dart';
 import 'package:collingo/presentation/themes/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
@@ -48,28 +49,32 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+        if (state is AuthSuccess) {
+          if (state.user != null) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => HomePage(username: state.user!.name),
               ),
             );
-          } else if (state is AuthFailure) {
-            setState(() {
-              if (state.message.contains("Invalid password")) {
-                passwordError = true;
-                passwordErrorMessage = state.message;
-              } else if (state.message.contains("Invalid user")) {
-                emailError = true;
-                emailErrorMessage = state.message;
-              } else {
-                emailError = true; 
-                emailErrorMessage = state.message; 
-              }
-            });
+          } else {
+            print("User is null in AuthSuccess state");
           }
-        },
+        } else if (state is AuthFailure) {
+          setState(() {
+            if (state.message.contains("Invalid password")) {
+              passwordError = true;
+              passwordErrorMessage = state.message;
+            } else if (state.message.contains("Invalid user")) {
+              emailError = true;
+              emailErrorMessage = state.message;
+            } else {
+              emailError = true; 
+              emailErrorMessage = state.message; 
+            }
+          });
+        }
+      },
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
@@ -103,6 +108,29 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: true,
                 hasError: passwordError,
                 errorMessage: passwordErrorMessage,
+              ),
+
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                      );
+                    },
+                    child: Text(
+                      'Forgot your password?',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 16,
+                      )
+                    ),
+                  ),
+                )
               ),
               SizedBox(height: 30),
 

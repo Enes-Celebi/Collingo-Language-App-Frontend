@@ -1,5 +1,6 @@
 import 'package:collingo/presentation/auth/blocs/auth/auth_cubit.dart';
 import 'package:collingo/presentation/auth/blocs/auth/auth_state.dart';
+import 'package:collingo/presentation/auth/pages/verify_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -44,8 +45,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => VerifyCode()),
             );
             emailController.clear();
           } else if (state is AuthFailure) {
@@ -99,9 +100,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       emailErrorMessage = "This field is required";
                     }
                   });
+                  
                   if (!emailError) {
+                    // Calling the Cubit to send the email for password reset
                     BlocProvider.of<AuthCubit>(context).requestPasswordChange(
-                      emailController.text,
+                      emailController.text,  // Passing the email to the Cubit
                     );
                   }
                 },

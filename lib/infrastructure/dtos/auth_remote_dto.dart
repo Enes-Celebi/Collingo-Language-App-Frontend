@@ -149,4 +149,31 @@ class AuthRemoteDTO {
       rethrow;
     }
   }
+
+  Future<void> verifyResetCode(String email, String code) async {
+    try {
+      final response = await client.post(
+        Uri.parse('${AppConstants.baseUrl}/api/auth/verify-reset-code'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'code': code
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Code verified successfully');
+      } else if (response.statusCode == 400) {
+        throw Exception('Invalid or expired code');
+      } else if (response.statusCode == 404) {
+        throw Exception('User not found');
+      } else {
+        throw Exception('Failed to verify code: ${response.body}');
+      }
+    } catch (e) {
+      print('Error verifying code: $e');
+      rethrow;
+    }
+  }
 }
+

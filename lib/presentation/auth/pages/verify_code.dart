@@ -1,7 +1,7 @@
 import 'package:collingo/presentation/auth/blocs/auth/auth_cubit.dart';
 import 'package:collingo/presentation/auth/blocs/auth/auth_state.dart';
 import 'package:collingo/presentation/auth/components/secondary_button.dart';
-import 'package:collingo/presentation/auth/pages/forgot_password_page.dart';
+import 'package:collingo/presentation/auth/pages/change_password_page.dart'; 
 import 'package:collingo/presentation/auth/widgets/code_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:collingo/presentation/auth/components/primary_button.dart';
@@ -30,6 +30,7 @@ class _VerifyCodeState extends State<VerifyCode> {
   }
 
   void _onOkPressed() {
+    // Check if the code is 6 digits
     if (codeController.text.length != 6 || !RegExp(r'^\d{6}$').hasMatch(codeController.text)) {
       setState(() {
         codeError = true;
@@ -38,6 +39,7 @@ class _VerifyCodeState extends State<VerifyCode> {
       return;
     }
 
+    // If code is valid, verify and then navigate to ChangePasswordPage
     context.read<AuthCubit>().verifyResetCode(codeController.text);
   }
 
@@ -59,7 +61,7 @@ class _VerifyCodeState extends State<VerifyCode> {
         listener: (context, state) {
           if (state is AuthSuccess) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+              MaterialPageRoute(builder: (context) => ChangePasswordPage()),
             );
             codeController.clear();
           } else if (state is AuthFailure) {
@@ -68,7 +70,7 @@ class _VerifyCodeState extends State<VerifyCode> {
             );
           }
         },
-        child : Padding(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -78,16 +80,16 @@ class _VerifyCodeState extends State<VerifyCode> {
                 'We\'ve sent a code to your email',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 22, 
-                  fontWeight: FontWeight.bold, 
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: screenHeight * 0.02), 
+              SizedBox(height: screenHeight * 0.02),
               Text(
-                'Enter the 6-digit code sent to $email',
+                'Enter the 6-digit code sent to your $email',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16, 
+                  fontSize: 16,
                   fontWeight: FontWeight.normal,
                 ),
               ),
@@ -96,7 +98,7 @@ class _VerifyCodeState extends State<VerifyCode> {
                 controller: codeController,
                 errorText: codeError ? codeErrorMessage : null,
               ),
-              SizedBox(height: screenHeight * 0.1), 
+              SizedBox(height: screenHeight * 0.1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -104,14 +106,14 @@ class _VerifyCodeState extends State<VerifyCode> {
                     child: SecondaryButton(
                       text: 'Go back',
                       onPressed: () {
-                        Navigator.of(context).pop(); 
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
                   Expanded(
                     child: PrimaryButton(
                       text: 'Continue',
-                      onPressed: _onOkPressed, 
+                      onPressed: _onOkPressed,
                     ),
                   ),
                 ],

@@ -6,6 +6,7 @@ import '../../../../core/models/user_model.dart';
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository authRepository;
   String? _lastSuccessfulEmail;
+  String? _verifiedCode;
 
   AuthCubit(this.authRepository) : super(AuthInitial());
 
@@ -67,11 +68,12 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> verifyResetCode(String code) async {
     if (_lastSuccessfulEmail == null) {
-      emit(AuthFailure(message: 'Email no tfound!'));
+      emit(AuthFailure(message: 'Email not found!'));
       return;
     }
     emit(AuthLoading());
     try {
+      _verifiedCode = code;
       await authRepository.verifyResetCode(_lastSuccessfulEmail!, code);
       emit(AuthSuccess(message: 'Successfully verified code!'));
     } catch (e) {
@@ -81,4 +83,20 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   String? get email => _lastSuccessfulEmail;
+  String? get code => _verifiedCode;
+
+  Future<void> resetPasswordWithCode(String newPassword) async {
+    if (_lastSuccessfulEmail == null || _verifiedCode == null) {
+      emit(AuthFailure(message: 'Couldn\'t verify email or code'));
+      return;
+    }
+    emit(AuthLoading());
+    try {
+      await authRepository.resetPasswordWithCode(_lastSuccessfulEmail!, _verifiedCode!, newPassword);
+      emit(AuthSuccess(message: 'Successfully reset password!'));
+    } catch (e) {
+      print('Code verification error: $e');
+      emit(AuthFailure(message: 'Failed to reset password'));
+    }
+  }
 }

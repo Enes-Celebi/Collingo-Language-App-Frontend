@@ -29,4 +29,8 @@ class AuthRepository {
   Future<void> verifyResetCode(String email, String code) {
     return remoteDTO.verifyResetCode(email, code);
   }
+
+  Future<void> resetPasswordWithCode(String email, String code, String newPassword) {
+    return remoteDTO.resetPasswordWithCode(email, code, newPassword);
+  }
 }

@@ -30,6 +30,12 @@ class AuthRemoteDTO {
         return UserModel.fromJson(jsonDecode(response.body)['user']);
       } else if (response.statusCode == 409) {
         throw Exception('User already exists');
+      } else if (response.statusCode == 400) {
+        throw Exception('Email, name, and password are required!');
+      } else if (response.statusCode == 401) {
+        throw Exception('Invalid email format!');
+      } else if (response.statusCode == 402) {
+        throw Exception('Password must be at least 8 characters long!');
       } else {
         throw Exception('Unexpected error');
       }
@@ -172,6 +178,31 @@ class AuthRemoteDTO {
       }
     } catch (e) {
       print('Error verifying code: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> resetPasswordWithCode(String email, String code, String newPassword) async {
+    try {
+      final response = await client.post(
+        Uri.parse('${AppConstants.baseUrl}/api/auth/reset-password-with-code'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'code': code,
+          'newPassword': newPassword
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('password reset successfully');
+      } else if (response.statusCode == 400) {
+        throw Exception('email, code, and newPassword are required');
+      } else {
+        throw Exception('Failed to reset password: ${response.body}');
+      }
+    } catch (e) {
+      print("Error resetting password: $e");
       rethrow;
     }
   }

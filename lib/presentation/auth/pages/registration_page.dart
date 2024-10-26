@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -101,14 +103,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
           }
           else if (state is AuthFailure) {
             setState(() {
+              isEmailError = false;
+              isPasswordError = false;
+              isConfirmPasswordError = false;
+
               if (state.message.contains('email')) {
                 isEmailError = true;
                 emailErrorMessage = state.message;
-              } else if (state.message.contains('password')) {
+              } else if (state.message.contains('Password must')) {
                 isPasswordError = true;
                 passwordErrorMessage = state.message;
-                isConfirmPasswordError = true;
-                confirmPasswordErrorMessage = state.message;
               } else {
                 isEmailError = true; 
                 emailErrorMessage = state.message;

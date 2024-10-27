@@ -1,23 +1,55 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'auth_state.dart';
 import '../../../../infrastructure/repositories/auth_repository.dart';
 import '../../../../core/models/user_model.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository authRepository;
+  final _storage = FlutterSecureStorage();
   String? _lastSuccessfulEmail;
   String? _verifiedCode;
 
   AuthCubit(this.authRepository) : super(AuthInitial());
 
+  
+  Future<void> checkAuthentication() async {
+    emit(AuthLoading());
+    try {
+      final user = await authRepository.authenticateWithToken();
+      if (user != null) {
+        emit(AuthSuccess(message: 'Successfully authenticated with token!', user: user));
+      } else {
+        emit(AuthFailure(message: 'No valid token found. Please log in'));
+      }
+    } catch (e) {
+      print("Authentication error: $e");
+      emit(AuthFailure(message: e.toString()));
+    }
+  }
+
   Future<void> login(String email, String password) async {
     emit(AuthLoading());
     try {
       final UserModel user = await authRepository.login(email, password);
+      
+      await _storage.write(key: 'isLoggedIn', value: 'true');
+      
       emit(AuthSuccess(message: 'Successfully logged in!', user: user));
     } catch (e) {
       print("Login error: $e");
       emit(AuthFailure(message: e.toString())); 
+    }
+  }
+
+  Future<void> logout() async {
+    emit(AuthLoading());
+    try {
+      await authRepository.logout();
+      emit(AuthSuccess(message: 'Successfully logged out!'));
+    } catch (e) {
+      print("Logout error: $e");
+      emit(AuthFailure(message: 'Failed to log out.'));
     }
   }
 

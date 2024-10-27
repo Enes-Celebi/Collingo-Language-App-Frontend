@@ -1,10 +1,12 @@
 import 'package:collingo/core/constants/app_constants.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../core/models/user_model.dart';
 
 class AuthRemoteDTO {
   final http.Client client;
+  final _storage = const FlutterSecureStorage();
 
   AuthRemoteDTO({required this.client});
 
@@ -44,6 +46,41 @@ class AuthRemoteDTO {
       rethrow;
     }
   }
+  
+  Future<UserModel?> authenticateWithToken() async {
+    final token = await _storage.read(key: 'auth_token');
+
+    print('Retrieved token after hot restart: $token');
+    if (token == null) {
+      return null;
+    }
+
+    try {
+      final response = await client.post(
+        Uri.parse('${AppConstants.baseUrl}/api/auth/validate-token'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'token': token}),
+      );
+
+      print('Token Validation Response Status: ${response.statusCode}');
+      print('Token Validation Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final userJson = jsonDecode(response.body)['user'];
+        final user = UserModel.fromJson(userJson);
+        print('User successfully logged in with token: ${user.id}');
+        return user;
+      } else {
+        print('Token validation failed. Status code: ${response.statusCode}');
+        return null; 
+      }
+    } catch (e) {
+      print('Error authenticating with token: $e');
+      return null;
+    }
+  }
 
   Future<UserModel> login(String email, String password) async {
     try {
@@ -64,10 +101,14 @@ class AuthRemoteDTO {
 
       if (response.statusCode == 200) {
         final user = UserModel.fromJson(jsonDecode(response.body)['user']);
+        final token = jsonDecode(response.body)['token'];
         
         if (!user.isVerified) {
           throw Exception('Email not verified!');
         }
+
+        await _storage.write(key: 'auth_token', value: token);
+        print('Token saved: $token');
 
         return user; 
       } else if (response.statusCode == 403) {
@@ -83,6 +124,14 @@ class AuthRemoteDTO {
       print('Error during login: $e');
       rethrow;
     }
+  }
+
+  Future<void> logout() async {
+    await _storage.delete(key: 'auth_token');
+  }
+
+  Future<String?> getToken() async {
+    return await _storage.read(key: 'auth_token');
   }
 
   Future<UserModel> signInWithGoogle(String token) async {
@@ -207,4 +256,3 @@ class AuthRemoteDTO {
     }
   }
 }
-

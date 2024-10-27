@@ -10,8 +10,20 @@ class AuthRepository {
     return remoteDTO.register(email, name, password);
   }
 
+  Future<UserModel?> authenticateWithToken() {
+    return remoteDTO.authenticateWithToken();
+  }
+
   Future<UserModel> login(String email, String password) {
     return remoteDTO.login(email, password);
+  }
+
+  Future<void> logout() {
+    return remoteDTO.logout();
+  }
+
+  Future<String?> getToken() {
+    return remoteDTO.getToken();
   }
 
   Future<UserModel> signInWithGoogle(String token) {

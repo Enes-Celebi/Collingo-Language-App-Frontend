@@ -68,6 +68,8 @@ class _LoginPageState extends State<LoginPage> {
             } else if (state.message.contains("Invalid user")) {
               emailError = true;
               emailErrorMessage = state.message;
+            } else if (state.message.contains("No valid token")) {
+              emailError = false;
             } else {
               emailError = true; 
               emailErrorMessage = state.message; 

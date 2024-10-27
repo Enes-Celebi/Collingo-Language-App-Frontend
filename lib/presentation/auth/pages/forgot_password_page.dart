@@ -102,9 +102,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   });
                   
                   if (!emailError) {
-                    // Calling the Cubit to send the email for password reset
                     BlocProvider.of<AuthCubit>(context).requestPasswordChange(
-                      emailController.text,  // Passing the email to the Cubit
+                      emailController.text, 
                     );
                   }
                 },
